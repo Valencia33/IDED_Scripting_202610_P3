@@ -10,10 +10,9 @@ public class SpawnController : MonoBehaviour
 
     private Vector3 spawnPoint;
 
-    // Start is called before the first frame update
     private void Start()
     {
-        if (TargetFactory.Instance != null)
+        if (TargetFactory.Instance != null && TargetFacade.Instance != null)
         {
             InvokeRepeating("SpawnObject", firstSpawnDelay, spawnRate);
 
@@ -26,15 +25,16 @@ public class SpawnController : MonoBehaviour
 
     private void SpawnObject()
     {
-        GameObject spawnGO = TargetFactory.Instance.CreateInstance().gameObject;
+        Target target = TargetFacade.Instance.GetTarget(((TargetFactory)TargetFactory.Instance).GetRawPrefabs());
 
-        if (spawnGO != null)
+        if (target != null)
         {
-            spawnPoint = Camera.main.ViewportToWorldPoint(new Vector3(
-                Random.Range(0F, 1F), 1F, transform.position.z));
+            spawnPoint = Camera.main.ViewportToWorldPoint(new Vector3(Random.Range(0F, 1F), 1F, transform.position.z));
 
-            spawnGO.transform.position = spawnPoint;
-            spawnGO.transform.rotation = Quaternion.identity;
+            target.transform.position = spawnPoint;
+            target.transform.rotation = Quaternion.identity;
+            
+            target.ActivateTarget(); 
         }
     }
 

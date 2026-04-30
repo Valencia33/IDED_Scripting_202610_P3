@@ -98,5 +98,13 @@ public class Player : MonoBehaviour
         {
             shootCommand?.Execute();
         }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            if (shootCommand != null)
+            {
+                shootCommand.ActivateTripleShoot();
+            }
+        }
     }
 }

@@ -17,10 +17,18 @@ public class Target : MonoBehaviour, IFactoryProduct
 
     public static event OnTargetDestroyed onTargetDestroyed;
 
+    public int PoolID { get; set; }
+
     private void Start()
     {
+
+    }
+
+    public void ActivateTarget()
+    {
         currentHP = maxHP;
-        Destroy(gameObject, TIME_TO_DESTROY);
+        CancelInvoke("ReturnToSystem");
+        Invoke("ReturnToSystem", TIME_TO_DESTROY); 
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -36,14 +44,28 @@ public class Target : MonoBehaviour, IFactoryProduct
             if (currentHP <= 0)
             {
                 onTargetDestroyed?.Invoke(scoreAdd);
-                Destroy(gameObject);
+                ReturnToSystem(); 
             }
         }
         else if (collidedObjectLayer.Equals(Utils.PlayerLayer) ||
             collidedObjectLayer.Equals(Utils.KillVolumeLayer))
         {
             Player.Instance.OnPlayerHit?.Invoke();
-            Destroy(gameObject);
+            ReturnToSystem(); 
+        }
+    }
+
+    private void ReturnToSystem()
+    {
+        CancelInvoke("ReturnToSystem");
+        
+        if (TargetFacade.Instance != null)
+        {
+            TargetFacade.Instance.ReturnTarget(this);
+        }
+        else
+        {
+            gameObject.SetActive(false);
         }
     }
 }
